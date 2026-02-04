@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>האלבום המשפחתי שלנו</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* איפוס ועיצוב בסיסי */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #17a398;
+            --error-color: #d33f49;
+            --success-color: #28a745;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --light-text: #f8f9fa;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+            --transition: all 0.3s ease;
+            --modal-overlay: rgba(0, 0, 0, 0.9);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* מסך כניסה */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%234a6fa5" fill-opacity="0.05" d="M0,0 L100,0 L100,100 L0,100 Z M20,20 L80,20 L80,80 L20,80 Z"/></svg>');
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logo {
+            margin-bottom: 30px;
+        }
+
+        .logo-svg {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        input {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background-color: rgba(211, 63, 73, 0.1);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-right: 4px solid var(--error-color);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success-color);
+            background-color: rgba(40, 167, 69, 0.1);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-right: 4px solid var(--success-color);
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* אנימציית וי */
+        .checkmark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .checkmark {
+            width: 200px;
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        .checkmark-circle {
+            stroke: var(--success-color);
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .checkmark-check {
+            transform-origin: 50% 50%;
+            stroke: var(--success-color);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-miterlimit: 10;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* מסך ראשי אחרי התחברות */
+        .main-screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* תפריט עליון */
+        .header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .site-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            max-width: 500px;
+            margin: 0 30px;
+        }
+
+        .search-box {
+            display: flex;
+            width: 100%;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            border: 2px solid #ddd;
+            border-right: none;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            padding: 12px 15px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* קטגוריות */
+        .categories-container {
+            background-color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .category-btn {
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            padding: 10px 25px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .category-btn:hover:not(.active) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .category-count {
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* סגנונות גלריה */
+        .gallery-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .gallery-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .gallery-styles {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .style-btn {
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .style-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .style-btn:hover:not(.active) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .gallery-info {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* גלריה עצמה */
+        .gallery {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* סגנונות שונים לגלריה */
+        .gallery.style1 {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .gallery.style2 {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-auto-rows: 200px;
+        }
+
+        .gallery.style3 {
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-rows: 250px;
+        }
+
+        .gallery.style4 {
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-auto-rows: 300px;
+        }
+
+        .gallery.style5 {
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 200px;
+        }
+
+        .gallery.style6 {
+            grid-template-columns: 1fr 1fr;
+            grid-auto-rows: 300px;
+        }
+
+        .gallery.style1 .gallery-item {
+            height: 250px;
+        }
+
+        .gallery.style2 .gallery-item {
+            height: 100%;
+        }
+
+        .gallery.style3 .gallery-item:nth-child(3n+1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery.style4 .gallery-item {
+            height: 100%;
+        }
+
+        .gallery.style5 .gallery-item:nth-child(5n+1) {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery.style6 .gallery-item {
+            height: 100%;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-item img, .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .item-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            color: white;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: var(--transition);
+        }
+
+        .gallery-item:hover .item-info {
+            transform: translateY(0);
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .item-category {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .item-tags {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .favorite-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .favorite-btn .heart {
+            width: 20px;
+            height: 20px;
+            transition: var(--transition);
+        }
+
+        .favorite-btn.active .heart {
+            fill: #ff4757;
+            filter: drop-shadow(0 0 3px rgba(255, 71, 87, 0.7));
+        }
+
+        /* כפתורי ניווט בגלריה */
+        .gallery-nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background-color: white;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            color: var(--dark-text);
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .page-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+
+        /* הודעת "לא נמצאו תוצאות" */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            display: none;
+        }
+
+        .no-results svg {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        /* Modal לתצוגת תמונה מלאה */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-overlay);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+            background-color: transparent;
+        }
+
+        .modal-media {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: #ff4757;
+            transform: rotate(90deg);
+        }
+
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.5rem;
+        }
+
+        .modal-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .modal-prev {
+            left: 20px;
+        }
+
+        .modal-next {
+            right: 20px;
+        }
+
+        .modal-info {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .modal-category {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .modal-favorite {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-favorite:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .modal-favorite .heart {
+            width: 25px;
+            height: 25px;
+            transition: var(--transition);
+        }
+
+        .modal-favorite.active .heart {
+            fill: #ff4757;
+            animation: heartbeat 0.5s ease;
+            filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.9));
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* עיצוב רספונסיבי */
+        @media (max-width: 992px) {
+            .gallery.style3, .gallery.style5, .gallery.style6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .modal-close {
+                top: -50px;
+                right: 0;
+            }
+            
+            .modal-nav {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-container {
+                margin: 15px 0;
+                max-width: 100%;
+            }
+            
+            .gallery-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .gallery.style3, .gallery.style5, .gallery.style6 {
+                grid-template-columns: 1fr;
+            }
+            
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .categories {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+            
+            .modal-prev {
+                left: 10px;
+            }
+            
+            .modal-next {
+                right: 10px;
+            }
+            
+            .modal-close {
+                top: -60px;
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .gallery-styles {
+                justify-content: center;
+            }
+            
+            .style-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .category-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* אנימציות */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- מסך התחברות -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="logo">
+                <!-- SVG לוגו -->
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#4a6fa5" opacity="0.1"/>
+                    <path d="M30,40 L50,20 L70,40 L65,45 L55,35 L55,70 L45,70 L45,35 L35,45 Z" fill="#4a6fa5"/>
+                    <circle cx="30" cy="65" r="8" fill="#17a398"/>
+                    <circle cx="50" cy="65" r="8" fill="#166088"/>
+                    <circle cx="70" cy="65" r="8" fill="#4a6fa5"/>
+                </svg>
+            </div>
+            
+            <h1>ברוכים הבאים</h1>
+            <p class="subtitle">לאתר המשפחתי שלנו</p>
+            
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="userName">שם משתמש:</label>
+                    <input type="text" id="userName" placeholder="השם שלך" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">סיסמה:</label>
+                    <input type="password" id="password" placeholder="הסיסמה שלך" required>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM8 15L3 10L4.41 8.59L8 12.17L15.59 4.58L17 6L8 15Z"/>
+                    </svg>
+                    כניסה לאתר
+                </button>
+            </form>
+            
+            <div class="error-message" id="errorMessage">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;margin-left:5px;">
+                    <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V13H11V15ZM11 11H9V5H11V11Z"/>
+                </svg>
+                שגיאה בנתונים, משתמש לא זוהה
+            </div>
+        </div>
+    </div>
+    
+    <!-- אנימציית וי לאחר התחברות -->
+    <div class="checkmark-container" id="checkmarkContainer">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <h2 id="welcomeMessage">התחברת בהצלחה!</h2>
+    </div>
+    
+    <!-- Modal לתצוגת תמונה מלאה -->
+    <div class="modal" id="imageModal">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <button class="modal-nav modal-prev" id="modalPrev">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 9L12 15L18 21L19.41 19.59L14.83 15L19.41 10.41L18 9Z"/>
+            </svg>
+        </button>
+        
+        <div class="modal-content">
+            <img class="modal-media" id="modalImage" src="" alt="">
+            <video class="modal-media" id="modalVideo" src="" controls style="display:none;"></video>
+            
+            <button class="modal-favorite" id="modalFavoriteBtn">
+                <svg class="heart" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <button class="modal-nav modal-next" id="modalNext">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 9L18 15L12 21L10.59 19.59L15.17 15L10.59 10.41L12 9Z"/>
+            </svg>
+        </button>
+        
+        <div class="modal-info">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-category" id="modalCategory"></div>
+        </div>
+    </div>
+    
+    <!-- מסך ראשי עם גלריה -->
+    <div class="main-screen" id="mainScreen">
+        <!-- תפריט עליון -->
+        <header class="header">
+            <div class="nav-container">
+                <div class="site-title">
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0C6.72 0 0 6.72 0 15C0 23.28 6.72 30 15 30C23.28 30 30 23.28 30 15C30 6.72 23.28 0 15 0ZM22.5 22.5H7.5V20H10V12.5C10 10.015 12.015 8 14.5 8C16.985 8 19 10.015 19 12.5V20H22.5V22.5ZM16.25 20V12.5C16.25 11.395 15.355 10.5 14.25 10.5C13.145 10.5 12.25 11.395 12.25 12.5V20H16.25Z"/>
+                    </svg>
+                    <span>משפחת קראוס מנדל</span>
+                </div>
+                
+                <div class="search-container">
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="חיפוש תמונות...">
+                        <button class="search-btn" id="searchBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12.5 11H11.71L11.43 10.73C12.41 9.59 13 8.11 13 6.5C13 2.91 10.09 0 6.5 0C2.91 0 0 2.91 0 6.5C0 10.09 2.91 13 6.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49L17.49 16L12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5C2 4.01 4.01 2 6.5 2C8.99 2 11 4.01 11 6.5C11 8.99 8.99 11 6.5 11Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <span id="currentUser">משתמש</span>
+                    <button class="logout-btn" id="logoutBtn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-left:5px;">
+                            <path d="M7 14H2V2H7V0H2C0.9 0 0 0.9 0 2V14C0 15.1 0.9 16 2 16H7V14ZM11.59 11.59L13 10.17L10.17 7.25L13 4.33L11.59 2.92L7.59 6.92L5.59 4.92L4.17 6.33L7 9.25L4.17 12.17L5.59 13.58L7.59 11.58L11.59 15.58L13 14.17L11.59 11.59Z"/>
+                        </svg>
+                        יציאה
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- קטגוריות -->
+        <div class="categories-container">
+            <div class="categories" id="categoriesList">
+                <!-- הקטגוריות יוטענו כאן דינמית -->
+            </div>
+        </div>
+        
+        <!-- גלריה -->
+        <div class="gallery-container">
+            <div class="gallery-controls">
+                <div class="gallery-styles">
+                    <button class="style-btn active" data-style="1">רשת אחידה</button>
+                    <button class="style-btn" data-style="2">רשת קומפקטית</button>
+                    <button class="style-btn" data-style="3">דגש על ראשונות</button>
+                    <button class="style-btn" data-style="4">גדול ומרווח</button>
+                    <button class="style-btn" data-style="5">פסיפס</button>
+                    <button class="style-btn" data-style="6">דו-עמודתי</button>
+                </div>
+                
+                <div class="gallery-info">
+                    <span id="imageCount">0 תמונות</span>
+                    <span> | </span>
+                    <span id="currentFilter">כל הקטגוריות</span>
+                    <span> | </span>
+                    <button class="btn" id="showFavoritesBtn" style="padding: 5px 15px; font-size: 0.9rem; margin-right: 10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        מועדפים
+                    </button>
+                </div>
+            </div>
+            
+            <!-- הודעת לא נמצאו תוצאות -->
+            <div class="no-results" id="noResults">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="#f0f0f0"/>
+                    <path d="M35,35 L65,65 M65,35 L35,65" stroke="#ccc" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="#ddd" stroke-width="2"/>
+                </svg>
+                <h3>לא נמצאו תוצאות עבור "<span id="searchQuery"></span>"</h3>
+                <p>נסו לחפש עם מילים אחרות או בדקו את איות המילים.</p>
+            </div>
+            
+            <!-- הגלריה עצמה -->
+            <div class="gallery style1" id="gallery"></div>
+            
+            <!-- ניווט בין עמודים -->
+            <div class="gallery-nav">
+                <button class="nav-btn" id="prevPage">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 5L6 10L11 15L12.41 13.59L8.83 10L12.41 6.41L11 5Z"/>
+                    </svg>
+                </button>
+                
+                <div class="page-indicator">
+                    <span id="currentPage">1</span>
+                    /
+                    <span id="totalPages">1</span>
+                </div>
+                
+                <button class="nav-btn" id="nextPage">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 5L14 10L9 15L7.59 13.59L11.17 10L7.59 6.41L9 5Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // נתוני משתמשים מאושרים עם סיסמאות
+        const authorizedUsers = {
+            "נתן": "n1234",
+            "שרהלה": "family2024",
+            "דוד": "mypassword123",
+            "שרה": "mypassword123"
+        };
+        
+        // נתוני גלריה לדוגמה - ניתן להוסיף תמונות נוספות בקלות
+        let galleryData = [
+            // חתונות
+            {
+                id: 1,
+                title: "חתונת סבא וסבתא - 1975",
+                category: "חתונות",
+                subCategory: "סבא משה וסבתא רחל",
+                tags: ["חתונה", "משפחה", "אירוע", "היסטוריה", "וינטג"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "1975",
+                location: "חיפה"
+            },
+            {
+                id: 2,
+                title: "חתונת דוד ואשתו",
+                category: "חתונות",
+                subCategory: "דוד גדעון",
+                tags: ["חתונה", "משפחה", "חגיגה", "אולם אירועים"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1465495976277-4387d4b0e4a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2010",
+                location: "תל אביב"
+            },
+            {
+                id: 3,
+                title: "חתונת אחותי",
+                category: "חתונות",
+                subCategory: "מיכל",
+                tags: ["חתונה", "כלה", "חופה", "ריקודים"],
+                type: "video",
+                src: "https://assets.mixkit.co/videos/preview/mixkit-bride-and-groom-cutting-the-wedding-cake-4398-large.mp4",
+                date: "2018",
+                location: "ירושלים"
+            },
+            {
+                id: 4,
+                title: "חתונה בצפון",
+                category: "חתונות",
+                subCategory: "המשפחה המורחבת",
+                tags: ["חתונה", "טבע", "צפון", "חוץ"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2019",
+                location: "הגליל"
+            },
+            // ימי הולדת
+            {
+                id: 5,
+                title: "יום הולדת 50 לאבא",
+                category: "ימי הולדת",
+                subCategory: "אבא דוד",
+                tags: ["יום הולדת", "מסיבה", "חגיגה", "גיל"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2015",
+                location: "בית"
+            },
+            {
+                id: 6,
+                title: "בר מצווה של יוני",
+                category: "ימי הולדת",
+                subCategory: "יוני",
+                tags: ["בר מצווה", "חגיגה", "משפחה", "ברית"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1523059623039-a9ed027e7fad?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2020",
+                location: "בית כנסת"
+            },
+            {
+                id: 7,
+                title: "יום הולדת 70 לסבא",
+                category: "ימי הולדת",
+                subCategory: "סבא משה",
+                tags: ["יום הולדת", "משפחה", "ארוחה", "חגיגה"],
+                type: "video",
+                src: "https://assets.mixkit.co/videos/preview/mixkit-family-celebrating-a-birthday-around-a-table-39817-large.mp4",
+                date: "2021",
+                location: "מסעדה"
+            },
+            // טיולים
+            {
+                id: 8,
+                title: "טיול משפחתי בצפון",
+                category: "טיולים",
+                subCategory: "כל המשפחה",
+                tags: ["טיול", "טבע", "נופש", "יחד", "צפון"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2019",
+                location: "גליל עליון"
+            },
+            {
+                id: 9,
+                title: "טיול לירושלים",
+                category: "טיולים",
+                subCategory: "המשפחה המורחבת",
+                tags: ["ירושלים", "טיול", "היסטוריה", "עתיקות"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1489945052260-4f21c52268b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2018",
+                location: "ירושלים"
+            },
+            {
+                id: 10,
+                title: "טיול שנתי של הילדים",
+                category: "טיולים",
+                subCategory: "הילדים",
+                tags: ["בית ספר", "טיול", "כיתה", "ילדים"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2022",
+                location: "גן לאומי"
+            },
+            // אירועים משפחתיים
+            {
+                id: 11,
+                title: "ארוחת ערב משפחתית",
+                category: "אירועים משפחתיים",
+                subCategory: "כל המשפחה",
+                tags: ["אוכל", "ביחד", "ערב", "ארוחה"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2023",
+                location: "בית"
+            },
+            {
+                id: 12,
+                title: "ברביקיו בגינה",
+                category: "אירועים משפחתיים",
+                subCategory: "אחי גדעון",
+                tags: ["ברביקיו", "גינה", "אוכל", "מנגל"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2022",
+                location: "גינה"
+            },
+            {
+                id: 13,
+                title: "פיקניק בפארק",
+                category: "אירועים משפחתיים",
+                subCategory: "הילדים",
+                tags: ["פיקניק", "פארק", "כיף", "שמש"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2021",
+                location: "פארק הירקון"
+            },
+            {
+                id: 14,
+                title: "סוף שבוע בים",
+                category: "אירועים משפחתיים",
+                subCategory: "אמא שרה",
+                tags: ["ים", "חוף", "שמש", "נופש", "חופשה"],
+                type: "video",
+                src: "https://assets.mixkit.co/videos/preview/mixkit-family-walking-on-the-beach-4293-large.mp4",
+                date: "2020",
+                location: "חוף הים"
+            },
+            // חגים ומסורת
+            {
+                id: 15,
+                title: "קבלת שבת משפחתית",
+                category: "חגים ומסורת",
+                subCategory: "כל המשפחה",
+                tags: ["שבת", "מסורת", "משפחה", "נרות"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1447078806655-40579c2520d6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2023",
+                location: "בית"
+            },
+            {
+                id: 16,
+                title: "סדר פסח",
+                category: "חגים ומסורת",
+                subCategory: "המשפחה המורחבת",
+                tags: ["פסח", "סדר", "חג", "מסורת"],
+                type: "image",
+                src: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+                date: "2022",
+                location: "סלון"
+            },
+            {
+                id: 17,
+                title: "חנוכה עם הילדים",
+                category: "חגים ומסורת",
+                subCategory: "הילדים",
+                tags: ["חנוכה", "סביבון", "נרות", "לביבות"],
+                type: "video",
+                src: "https://assets.mixkit.co/videos/preview/mixkit-family-celebrating-hanukkah-39819-large.mp4",
+                date: "2021",
+                location: "בית"
+            }
+        ];
+        
+        // משתנים גלובליים
+        let currentUser = "";
+        let currentStyle = 1;
+        let currentPage = 1;
+        const itemsPerPage = 12;
+        let filteredData = [...galleryData];
+        let currentSearchTerm = "";
+        let currentCategory = "הכל";
+        let showOnlyFavorites = false;
+        let userFavorites = {};
+        
+        // טעינת מועדפים מהזיכרון המקומי
+        function loadFavorites() {
+            const savedFavorites = localStorage.getItem(`familyAlbumFavorites_${currentUser}`);
+            if (savedFavorites) {
+                userFavorites = JSON.parse(savedFavorites);
+            } else {
+                userFavorites = {};
+            }
+        }
+        
+        // שמירת מועדפים בזיכרון המקומי
+        function saveFavorites() {
+            localStorage.setItem(`familyAlbumFavorites_${currentUser}`, JSON.stringify(userFavorites));
+        }
+        
+        // אלמנטים DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const mainScreen = document.getElementById('mainScreen');
+        const loginForm = document.getElementById('loginForm');
+        const userNameInput = document.getElementById('userName');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const checkmarkContainer = document.getElementById('checkmarkContainer');
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const currentUserElement = document.getElementById('currentUser');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const gallery = document.getElementById('gallery');
+        const styleButtons = document.querySelectorAll('.style-btn');
+        const imageCount = document.getElementById('imageCount');
+        const currentFilter = document.getElementById('currentFilter');
+        const noResults = document.getElementById('noResults');
+        const searchQuery = document.getElementById('searchQuery');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const currentPageElement = document.getElementById('currentPage');
+        const totalPagesElement = document.getElementById('totalPages');
+        const categoriesList = document.getElementById('categoriesList');
+        const showFavoritesBtn = document.getElementById('showFavoritesBtn');
+        
+        // Modal elements
+        const imageModal = document.getElementById('imageModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalPrev = document.getElementById('modalPrev');
+        const modalNext = document.getElementById('modalNext');
+        const modalImage = document.getElementById('modalImage');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
+        let currentModalIndex = -1;
+        let currentModalItems = [];
+        
+        // טיפול בהתחברות
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userName = userNameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            // הגנת XSS בסיסית - הסרת תגיות HTML
+            const sanitizedUserName = userName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const sanitizedPassword = password.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            // בדיקת נתונים
+            if (authorizedUsers.hasOwnProperty(userName) && authorizedUsers[userName] === password) {
+                // כניסה מאושרת
+                currentUser = userName;
+                loadFavorites(); // טעינת המועדפים של המשתמש
+                showSuccessAnimation();
+            } else {
+                // שגיאה בנתונים
+                showError();
+            }
+        });
+        
+        // הצגת שגיאה
+        function showError() {
+            errorMessage.style.display = 'block';
+            errorMessage.classList.add('fade-in');
+            
+            // אנימציה רוטטת לשדות
+            userNameInput.style.borderColor = 'var(--error-color)';
+            passwordInput.style.borderColor = 'var(--error-color)';
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('fade-in');
+            }, 3000);
+        }
+        
+        // הצגת אנימציית הצלחה
+        function showSuccessAnimation() {
+            checkmarkContainer.style.display = 'flex';
+            welcomeMessage.textContent = `התחברת בהצלחה, ${currentUser}!`;
+            
+            // הסתרת מסך התחברות
+            loginScreen.style.display = 'none';
+            
+            // אחרי 2.5 שניות, הצגת המסך הראשי
+            setTimeout(() => {
+                checkmarkContainer.style.display = 'none';
+                mainScreen.style.display = 'block';
+                currentUserElement.textContent = currentUser;
+                
+                // טעינת הגלריה
+                renderCategories();
+                renderGallery();
+                updatePagination();
+            }, 2500);
+        }
+        
+        // יציאה מהמערכת
+        logoutBtn.addEventListener('click', function() {
+            mainScreen.style.display = 'none';
+            loginScreen.style.display = 'flex';
+            currentUser = "";
+            userNameInput.value = "";
+            passwordInput.value = "";
+            errorMessage.style.display = 'none';
+            
+            // איפוס שדות
+            userNameInput.style.borderColor = '#ddd';
+            passwordInput.style.borderColor = '#ddd';
+        });
+        
+        // חיפוש בגלריה
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            currentSearchTerm = searchTerm;
+            
+            if (searchTerm === "") {
+                // איפוס החיפוש
+                applyFilters();
+            } else {
+                // חיפוש חכם עם התאמה חלקית וגמישות לשגיאות כתיב
+                filteredData = galleryData.filter(item => {
+                    // אם אנחנו מציגים רק מועדפים, נבדוק גם את זה
+                    if (showOnlyFavorites && !userFavorites[item.id]) {
+                        return false;
+                    }
+                    
+                    // אם יש קטגוריה נבחרת, נבדוק גם את זה
+                    if (currentCategory !== "הכל" && item.category !== currentCategory) {
+                        return false;
+                    }
+                    
+                    const searchFields = [
+                        item.title,
+                        item.category,
+                        item.subCategory,
+                        item.date,
+                        item.location,
+                        ...item.tags
+                    ].join(" ").toLowerCase();
+                    
+                    // חיפוש רגיל
+                    if (searchFields.includes(searchTerm.toLowerCase())) {
+                        return true;
+                    }
+                    
+                    // התאמה חלקית למילים (אם מילה מתחילה בערך החיפוש)
+                    const searchWords = searchTerm.toLowerCase().split(" ");
+                    const itemWords = searchFields.split(" ");
+                    
+                    for (const searchWord of searchWords) {
+                        if (searchWord.length < 2) continue;
+                        
+                        for (const itemWord of itemWords) {
+                            if (itemWord.startsWith(searchWord) || 
+                                searchWord.startsWith(itemWord.substring(0, 3))) {
+                                return true;
+                            }
+                        }
+                    }
+                    
+                    return false;
+                });
+                
+                currentFilter.textContent = `תוצאות חיפוש עבור "${searchTerm}"`;
+                
+                if (filteredData.length === 0) {
+                    searchQuery.textContent = searchTerm;
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            }
+            
+            currentPage = 1;
+            renderGallery();
+            updatePagination();
+        }
+        
+        // סינון לפי קטגוריה
+        function filterByCategory(category) {
+            currentCategory = category;
+            applyFilters();
+        }
+        
+        // סינון לפי מועדפים
+        function toggleFavorites() {
+            showOnlyFavorites = !showOnlyFavorites;
+            applyFilters();
+            
+            // עדכון טקסט הכפתור
+            if (showOnlyFavorites) {
+                showFavoritesBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff4757" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    כל התמונות
+                `;
+                showFavoritesBtn.style.backgroundColor = '#ff4757';
+            } else {
+                showFavoritesBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    מועדפים
+                `;
+                showFavoritesBtn.style.backgroundColor = '';
+            }
+        }
+        
+        // החלת כל הסינונים יחד
+        function applyFilters() {
+            filteredData = galleryData.filter(item => {
+                // סינון לפי קטגוריה
+                if (currentCategory !== "הכל" && item.category !== currentCategory) {
+                    return false;
+                }
+                
+                // סינון לפי מועדפים
+                if (showOnlyFavorites && !userFavorites[item.id]) {
+                    return false;
+                }
+                
+                // סינון לפי חיפוש
+                if (currentSearchTerm !== "") {
+                    const searchFields = [
+                        item.title,
+                        item.category,
+                        item.subCategory,
+                        item.date,
+                        item.location,
+                        ...item.tags
+                    ].join(" ").toLowerCase();
+                    
+                    if (!searchFields.includes(currentSearchTerm.toLowerCase())) {
+                        const searchWords = currentSearchTerm.toLowerCase().split(" ");
+                        const itemWords = searchFields.split(" ");
+                        let found = false;
+                        
+                        for (const searchWord of searchWords) {
+                            if (searchWord.length < 2) continue;
+                            
+                            for (const itemWord of itemWords) {
+                                if (itemWord.startsWith(searchWord) || 
+                                    searchWord.startsWith(itemWord.substring(0, 3))) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found) break;
+                        }
+                        
+                        if (!found) return false;
+                    }
+                }
+                
+                return true;
+            });
+            
+            // עדכון טקסט הסינון
+            let filterText = "";
+            if (currentCategory !== "הכל") {
+                filterText += currentCategory;
+            }
+            if (showOnlyFavorites) {
+                if (filterText) filterText += " | ";
+                filterText += "מועדפים";
+            }
+            if (currentSearchTerm) {
+                if (filterText) filterText += " | ";
+                filterText += `חיפוש: "${currentSearchTerm}"`;
+            }
+            
+            currentFilter.textContent = filterText || "כל הקטגוריות";
+            
+            if (filteredData.length === 0) {
+                noResults.style.display = 'block';
+                searchQuery.textContent = currentSearchTerm || currentCategory;
+            } else {
+                noResults.style.display = 'none';
+            }
+            
+            currentPage = 1;
+            renderGallery();
+            updatePagination();
+        }
+        
+        // רינדור הקטגוריות
+        function renderCategories() {
+            categoriesList.innerHTML = '';
+            
+            // יצירת רשימת קטגוריות ייחודיות
+            const categories = ["הכל"];
+            galleryData.forEach(item => {
+                if (!categories.includes(item.category)) {
+                    categories.push(item.category);
+                }
+            });
+            
+            // יצירת כפתורי קטגוריות
+            categories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'category-btn';
+                if (category === currentCategory) {
+                    button.classList.add('active');
+                }
+                
+                // ספירת פריטים בקטגוריה
+                let count = 0;
+                if (category === "הכל") {
+                    count = galleryData.length;
+                } else {
+                    count = galleryData.filter(item => item.category === category).length;
+                }
+                
+                // אייקון לקטגוריה
+                let iconSvg = '';
+                switch(category) {
+                    case "חתונות":
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
+                        break;
+                    case "ימי הולדת":
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z"/></svg>';
+                        break;
+                    case "טיולים":
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5s1.1-2.5 2.5-2.5 2.5 1.1 2.5 2.5-1.1 2.5-2.5 2.5z"/></svg>';
+                        break;
+                    case "אירועים משפחתיים":
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
+                        break;
+                    case "חגים ומסורת":
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>';
+                        break;
+                    default:
+                        iconSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
+                }
+                
+                button.innerHTML = `
+                    ${iconSvg}
+                    ${category}
+                    <span class="category-count">${count}</span>
+                `;
+                
+                button.addEventListener('click', () => {
+                    // הסרת פעיל מכל הכפתורים
+                    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                    // הוספת פעיל לכפתור הנוכחי
+                    button.classList.add('active');
+                    // סינון לפי קטגוריה
+                    filterByCategory(category);
+                });
+                
+                categoriesList.appendChild(button);
+            });
+        }
+        
+        // שינוי סגנון גלריה
+        styleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // הסרת פעיל מכל הכפתורים
+                styleButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // הוספת פעיל לכפתור הנוכחי
+                this.classList.add('active');
+                
+                // שינוי סגנון הגלריה
+                currentStyle = parseInt(this.getAttribute('data-style'));
+                gallery.className = 'gallery';
+                gallery.classList.add('style' + currentStyle);
+                
+                // רינדור מחדש
+                renderGallery();
+            });
+        });
+        
+        // רינדור הגלריה
+        function renderGallery() {
+            gallery.innerHTML = '';
+            
+            // חישוב פריטים לעמוד הנוכחי
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageItems = filteredData.slice(startIndex, endIndex);
+            
+            // עדכון סטטוס
+            imageCount.textContent = `${filteredData.length} פריטים`;
+            
+            // אם אין פריטים, לא מציגים כלום
+            if (pageItems.length === 0) {
+                return;
+            }
+            
+            // יצירת פריטי הגלריה
+            pageItems.forEach((item, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item fade-in';
+                galleryItem.dataset.index = startIndex + index;
+                
+                let mediaElement;
+                if (item.type === 'video') {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = item.src;
+                    mediaElement.muted = true;
+                    mediaElement.setAttribute('poster', 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%234a6fa5" opacity="0.1"/><circle cx="200" cy="150" r="40" fill="%234a6fa5" opacity="0.3"/><polygon points="180,130 180,170 220,150" fill="%234a6fa5"/></svg>');
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = item.src;
+                    mediaElement.alt = item.title;
+                    mediaElement.onerror = function() {
+                        this.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%234a6fa5" opacity="0.1"/><path d="M100,100 L300,100 L300,200 L100,200 Z M120,120 L280,120 L280,180 L120,180 Z M150,150 L170,170 L190,150 L210,170 L230,150 L250,170 L270,150" fill="none" stroke="%234a6fa5" stroke-width="2"/><circle cx="150" cy="140" r="20" fill="%2317a398" opacity="0.5"/><circle cx="250" cy="140" r="15" fill="%23166088" opacity="0.5"/></svg>';
+                    };
+                }
+                
+                // כפתור מועדפים
+                const favoriteBtn = document.createElement('button');
+                favoriteBtn.className = 'favorite-btn';
+                if (userFavorites[item.id]) {
+                    favoriteBtn.classList.add('active');
+                }
+                
+                favoriteBtn.innerHTML = `
+                    <svg class="heart" viewBox="0 0 24 24" fill="${userFavorites[item.id] ? '#ff4757' : 'white'}" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                `;
+                
+                favoriteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(item.id, favoriteBtn);
+                });
+                
+                const itemInfo = document.createElement('div');
+                itemInfo.className = 'item-info';
+                
+                itemInfo.innerHTML = `
+                    <div class="item-title">${item.title}</div>
+                    <div class="item-category">${item.category} | ${item.subCategory}</div>
+                    <div class="item-tags">
+                        ${item.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                `;
+                
+                galleryItem.appendChild(mediaElement);
+                galleryItem.appendChild(favoriteBtn);
+                galleryItem.appendChild(itemInfo);
+                
+                // לחיצה על פריט בגלריה פותחת אותו ב-Modal
+                galleryItem.addEventListener('click', () => {
+                    openModal(startIndex + index);
+                });
+                
+                gallery.appendChild(galleryItem);
+            });
+        }
+        
+        // ניהול דפדוף בעמודים
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            currentPageElement.textContent = currentPage;
+            totalPagesElement.textContent = totalPages;
+            
+            // הפעלה/ביטול כפתורי ניווט
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+            
+            // עיצוב ויזואלי לכפתורים מושבתים
+            prevPageBtn.style.opacity = currentPage === 1 ? '0.5' : '1';
+            nextPageBtn.style.opacity = (currentPage === totalPages || totalPages === 0) ? '0.5' : '1';
+        }
+        
+        // מעבר לעמוד הבא
+        nextPageBtn.addEventListener('click', function() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderGallery();
+                updatePagination();
+            }
+        });
+        
+        // מעבר לעמוד הקודם
+        prevPageBtn.addEventListener('click', function() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderGallery();
+                updatePagination();
+            }
+        });
+        
+        // כפתור מועדפים
+        showFavoritesBtn.addEventListener('click', toggleFavorites);
+        
+        // ניהול מועדפים
+        function toggleFavorite(itemId, buttonElement = null) {
+            if (userFavorites[itemId]) {
+                delete userFavorites[itemId];
+                if (buttonElement) {
+                    buttonElement.classList.remove('active');
+                    buttonElement.querySelector('.heart').setAttribute('fill', 'white');
+                }
+            } else {
+                userFavorites[itemId] = true;
+                if (buttonElement) {
+                    buttonElement.classList.add('active');
+                    buttonElement.querySelector('.heart').setAttribute('fill', '#ff4757');
+                }
+            }
+            
+            // עדכון הכפתור ב-Modal אם הוא פתוח
+            if (currentModalIndex !== -1 && filteredData[currentModalIndex] && filteredData[currentModalIndex].id === itemId) {
+                if (userFavorites[itemId]) {
+                    modalFavoriteBtn.classList.add('active');
+                } else {
+                    modalFavoriteBtn.classList.remove('active');
+                }
+            }
+            
+            saveFavorites(); // שמירה בזיכרון המקומי
+            
+            // אם אנחנו במצב "רק מועדפים", צריך לעדכן את התצוגה
+            if (showOnlyFavorites) {
+                applyFilters();
+            }
+        }
+        
+        // פתיחת Modal
+        function openModal(index) {
+            currentModalIndex = index;
+            currentModalItems = [...filteredData];
+            
+            const item = filteredData[index];
+            
+            if (item.type === 'video') {
+                modalImage.style.display = 'none';
+                modalVideo.style.display = 'block';
+                modalVideo.src = item.src;
+                modalVideo.controls = true;
+                modalVideo.play();
+            } else {
+                modalVideo.style.display = 'none';
+                modalVideo.pause();
+                modalImage.style.display = 'block';
+                modalImage.src = item.src;
+                modalImage.alt = item.title;
+            }
+            
+            modalTitle.textContent = item.title;
+            modalCategory.textContent = `${item.category} | ${item.subCategory} | ${item.date} | ${item.location}`;
+            
+            // עדכון כפתור המועדפים
+            if (userFavorites[item.id]) {
+                modalFavoriteBtn.classList.add('active');
+            } else {
+                modalFavoriteBtn.classList.remove('active');
+            }
+            
+            // עדכון אירוע המועדפים
+            modalFavoriteBtn.onclick = () => {
+                toggleFavorite(item.id);
+            };
+            
+            imageModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // מונע גלילה בגוף הדף
+        }
+        
+        // סגירת Modal
+        function closeModal() {
+            imageModal.style.display = 'none';
+            modalVideo.pause();
+            document.body.style.overflow = 'auto'; // מחזיר גלילה לגוף הדף
+            currentModalIndex = -1;
+        }
+        
+        // מעבר לתמונה הבאה
+        function nextModal() {
+            if (currentModalIndex < currentModalItems.length - 1) {
+                openModal(currentModalIndex + 1);
+            } else {
+                // אם זו התמונה האחרונה, חוזרים להתחלה
+                openModal(0);
+            }
+        }
+        
+        // מעבר לתמונה הקודמת
+        function prevModal() {
+            if (currentModalIndex > 0) {
+                openModal(currentModalIndex - 1);
+            } else {
+                // אם זו התמונה הראשונה, עוברים לאחרונה
+                openModal(currentModalItems.length - 1);
+            }
+        }
+        
+        // אירועים ל-Modal
+        modalClose.addEventListener('click', closeModal);
+        modalNext.addEventListener('click', nextModal);
+        modalPrev.addEventListener('click', prevModal);
+        
+        // סגירת Modal עם מקש Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            } else if (imageModal.style.display === 'flex') {
+                if (e.key === 'ArrowRight') {
+                    nextModal();
+                } else if (e.key === 'ArrowLeft') {
+                    prevModal();
+                }
+            }
+        });
+        
+        // לחיצה מחוץ ל-Modal סוגרת אותו
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                closeModal();
+            }
+        });
+        
+        // אתחול המערכת
+        document.addEventListener('DOMContentLoaded', function() {
+            // הגדרת אירועים נוספים
+            userNameInput.addEventListener('input', function() {
+                this.style.borderColor = '#ddd';
+                errorMessage.style.display = 'none';
+            });
+            
+            passwordInput.addEventListener('input', function() {
+                this.style.borderColor = '#ddd';
+                errorMessage.style.display = 'none';
+            });
+        });
+        
+        // פונקציות שירות למפתח - ניתן לקרוא מהקונסולה
+        
+        // הוספת משתמש חדש
+        window.addUser = function(username, password) {
+            if (!authorizedUsers.hasOwnProperty(username)) {
+                authorizedUsers[username] = password;
+                console.log(`המשתמש "${username}" נוסף בהצלחה עם הסיסמה "${password}"`);
+                console.log("רשימת המשתמשים:", Object.keys(authorizedUsers));
+            } else {
+                console.log(`המשתמש "${username}" כבר קיים במערכת.`);
+            }
+        };
+        
+        // הוספת תמונה חדשה
+        window.addImage = function(imageData) {
+            // בדיקה שכל השדות הנדרשים קיימים
+            const requiredFields = ['title', 'category', 'subCategory', 'type', 'src'];
+            for (const field of requiredFields) {
+                if (!imageData[field]) {
+                    console.error(`שדה חובה חסר: ${field}`);
+                    return;
+                }
+            }
+            
+            // יצירת ID חדש
+            const newId = Math.max(...galleryData.map(item => item.id)) + 1;
+            
+            // יצירת האובייקט המלא
+            const newItem = {
+                id: newId,
+                title: imageData.title,
+                category: imageData.category,
+                subCategory: imageData.subCategory,
+                tags: imageData.tags || [],
+                type: imageData.type,
+                src: imageData.src,
+                date: imageData.date || new Date().getFullYear().toString(),
+                location: imageData.location || "לא צוין"
+            };
+            
+            // הוספה למערך
+            galleryData.push(newItem);
+            
+            // עדכון התצוגה
+            renderCategories();
+            applyFilters();
+            
+            console.log(`תמונה נוספה בהצלחה עם ID: ${newId}`);
+            console.log("סה\"כ תמונות במערכת:", galleryData.length);
+        };
+        
+        // הצגת סטטיסטיקות
+        window.showStats = function() {
+            console.log("=== סטטיסטיקות האתר ===");
+            console.log(`מספר תמונות: ${galleryData.length}`);
+            console.log(`מספר משתמשים: ${Object.keys(authorizedUsers).length}`);
+            
+            // ספירת פריטים לפי קטגוריה
+            const categoryCounts = {};
+            galleryData.forEach(item => {
+                categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+            });
+            
+            console.log("פריטים לפי קטגוריה:");
+            for (const [category, count] of Object.entries(categoryCounts)) {
+                console.log(`  ${category}: ${count}`);
+            }
+            
+            console.log(`מספר פריטים מועדפים למשתמש הנוכחי: ${Object.keys(userFavorites).length}`);
+        };
+    </script>
+</body>
+</html>
